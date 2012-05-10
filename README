@@ -1,0 +1,7 @@
+Javascript project manager example app:
+* agile_server_redis.js: node.js with redis test implementation
+* agile_server2.js: node.js server
+* design_work.html: design exploration
+* generate_color_gradient.js: gradient pregeneration optimisation
+* index.html: backbone.js implementation
+* okindex.html: knockout.js implementation

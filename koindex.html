@@ -1,0 +1,353 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+  <title>Agile Tasker</title> 
+ 
+	<link type="text/css" href="/stylesheets/ui-lightness/jquery-ui-1.8.6.custom.css" rel="Stylesheet" />	
+	<link type="text/css" href="/stylesheets/main.css" rel="stylesheet" media="all"/>
+		
+	<script type="text/javascript" src="http://localhost:1337/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/javascripts/vendors/jquery.js"></script> 
+	<script type="text/javascript" src="/javascripts/vendors/jquery-ui-1.8.6.custom.min.js"></script>
+	<script type="text/javascript" src="/javascripts/vendors/jquery.tmpl.js"></script>
+	<script type="text/javascript" src="/javascripts/vendors/knockout-1.2.1.js"></script>
+  
+  <div class="project">
+    <span class="project-title" data-bind='text: projectTitle, click: startEditTitle'></span>
+    <input type="text" class="project-title-input" data-bind="value: projectTitle, event: {change: stopEditTitle, blur: stopEditTitle}" size="10" maxlength="128" />
+    <div id="pileContainer">
+      <ol class="piles">
+        <div data-bind='template: { name: "pileTemplate", foreach: piles }'></div>
+      </ol>
+    </div>
+  </div>
+  
+  <script id="pileTemplate" type="text/html">
+    <div class="pileBox">
+      <img class="taskInsertGhost" src="images/insert_task_ghost.jpeg" alt="Insert" />
+      <div class="pileHeader">
+        <input type="text" value=${ title } class="pileInput" />
+        <a class="pileButton1" href="#"><img src="images/goto_left.jpeg" alt="Move left" /></a>
+        <a class="pileButton2" href="#"><img src="images/goto_right.jpeg" alt="Move right" /></a>
+        <a class="pileButton3" href="#"><img src="images/done.jpeg" alt="Archive" /></a>
+      </div>
+      <ol id="pile1" class="connectedSortable">
+      	<div data-bind='template: { name: "taskTemplate", foreach: tasks }'></div>
+      </ol>
+    </div>
+  </script>
+
+  <script id="taskTemplate" type="text/html">
+    <li class="taskBox">
+	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+	    <div style="display: inline;">
+	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">${ title }</textarea>
+	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+	    </div>
+	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+	    <div class="taskInsertLastBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+	    <div class="smalldate">Sept 18, 2011</div>
+	  </li>
+  </script>
+
+	<script>
+    var colorGradient = ["#ff7465", "#ff796a", "#ff7d6f", "#ff8274", "#ff877a", "#ff8b7f", "#ff9084", "#ff9489", "#ff998e", "#ff9e93", "#ffa298", "#ffa79d", "#ffaca3", "#ffb0a8", "#ffb5ad", "#ffbab2", "#ffbeb7", "#ffc3bc", "#ffc7c1", "#ffccc7", "#ffd1cc", "#ffd5d1", "#ffdad6", "#ffdfdb", "#ffe3e0", "#ffe8e5", "#ffecea", "#fff1f0", "#fff6f5", "#fffafa", "#ffffff"];
+    var gradientLen = colorGradient.length;
+	  
+	  var viewModel = {
+	    projectId: ko.observable(null),
+	    projectTitle: ko.observable(""),
+	    
+	    piles: ko.observableArray(),
+	    trash: ko.observableArray(),
+	    
+	    startEditTitle: function() {
+	      $(".project-title").hide();
+	      $(".project-title-input").show();
+	      $('.project-title-input').select();
+	    },
+	    
+	    stopEditTitle: function() {
+	      $(".project-title").show();
+	      $(".project-title-input").hide();
+	      //sync({title: $('.project-title-input').val()});
+	    }
+	  };
+	  
+	  $(".project-title-input").hide();
+	  ko.applyBindings(viewModel);
+	  
+	  // function getURLParameter(name){
+    //       return unescape((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+    //     }
+    // 
+		
+    // var Project = Backbone.Model.extend({
+    //  
+    //  validate: function(attrs){
+    //    if (attrs.title.length == 0) {
+    //      attrs.title = "My project";
+    //    }
+    //  },
+
+    // });
+		
+		// TODO implement a system that asks the user to reload the page if the state "working..." is staying too long, this could happen if the client has missed the server response for any reason
+		
+
+		
+		// TODO: If the server returns an attributes hash that differs, the model's state will be `set` again.
+    function sync(method, type){
+      var requestId = window.app.newRequestId();
+      var query;
+      query = '{"r":"'+requestId+'","p":"'+viewModel.projectId()+'"';
+      if (type == 'p') {
+        if (method == 'r') {
+          query += ',"x":"1"}';
+        } else if (method == 'c' || method == 'u') {
+          query += ',"x":"2","t":"'+viewModel.projectTitle()+'"}';
+        } else {
+          // TODO delete project
+        }
+      //} else if (type == 'pile') {
+      } else {
+        window.app.log('Oops an error occured, try to reload the page');
+      }
+      window.app.registerRequest(requestId, query);
+      window.app.log("Working...");
+      window.app.socket.emit('message', query);
+		}
+
+    window.app = {
+      initialize: function() {
+        this.lastRid = 0;
+        this.requestQueue = new Array();
+        this.undoQueue = new Array();
+      
+        var connectError = false;
+        try {
+          this.socket = io.connect('http://localhost:1337');
+        } catch(err) {
+          connectError = true;
+          // TODO start readonly offline mode here
+          window.app.log("Sorry our server appears to be down, we are working to bring it up as soon as possible!");
+          return;
+        }
+        if (connectError == true) { return ; }
+      
+        this.initProject();
+      
+        this.socket.on('connect', function(){
+    		  window.app.log("");
+    		});
+
+    		this.socket.on('disconnect', function(){
+    		  window.app.log("Working..."); // TODO try to reconnect to the server
+    		});
+		
+    		this.socket.on('message', function (data) {
+    		  var obj = JSON.parse(data);
+    		  if (obj.r !== undefined) {
+    		    window.app.handleResponse(obj);
+    		  } else {
+    		    window.app.handleUpdate(obj);
+  		    }
+        });
+      },
+    
+      IdFromUrl: function() {
+        return (window.location.search.substr(1));// removing the '?'
+      },
+    
+      initProject: function() {
+        var id = this.IdFromUrl();
+  	    if (id == "") {
+  	      window.location.href = "?"+'p'+this.randomId()+this.randomId()+this.randomId();// with 'p' we ensure that it will be interpreted as a String
+  	    } else {
+  	      viewModel.projectId(id);
+  	      sync("r", "p");
+  	    }
+  	  },
+    
+      registerRequest: function(rId, query){
+        this.requestQueue[this.requestQueue.length] = {"rId": rId, "query": query};
+      },
+
+      // here a request id may arrive but we lost track of it on the client side, we ignore this case as it could happen when reloading the page
+      handleResponse: function(obj){
+        var i = this.requestQueue.length;
+        while (i--) {
+          if (this.requestQueue[i].rId == obj.r){
+        	  var r = this.requestQueue.splice(i, 1);
+            this.undoQueue.push(r);
+        	  break;
+        	}
+        }
+        if (obj.s == 'ko') {
+  	      window.app.log("Oops an error occured, try to reload the page");
+  	    } else if (window.app.requestQueue.length == 0) {
+  	      window.app.log(""); // we clear the log only if every request got an answer, which is supposed to happen (by the way, this could be removed if causing problems of remaining "Working..." message)
+        }
+      },
+    
+      handleUpdate: function(obj){
+        if (obj.p != this.IdFromUrl()) { return; } // if the data are coming from another project, we ignore them
+        switch (obj.x) {
+        case '1': // GET PROJECT
+          // TODO empty the current project before loading
+          // TODO silent everything to update the screen at the end all at once
+          viewModel.projectTitle(obj.t);
+          var i = obj.piles.length;
+          var j;
+          var pileData;
+          var taskData;
+          var currentPileIndex = 0;
+          var currentPile;
+          while (i--) {
+            pileData = obj.piles[i]
+            viewModel.piles.push( {id: pileData.id, title: pileData.t, tasks: ko.observableArray()} );
+            currentPile = viewModel.piles()[currentPileIndex];
+            j = pileData.tasks.length;
+            while (j--) {
+              taskData = pileData.tasks[j];
+              currentPile.tasks.push( {id: taskData.id, title: taskData.t, created_at: taskData.c} );
+            }
+            currentPile.tasks( currentPile.tasks().reverse() );
+            currentPileIndex += 1;
+          }
+          viewModel.piles( viewModel.piles.reverse() );
+          // TODO load trash
+          break;
+        case '2': // RENAME PROJECT (+CREATE PROJECT) (=RENAME PILE)
+          this.project.set({title: obj.t});
+          this.project.view.render();
+          break;
+        default:
+          window.app.log("Oops an error occured, try to reload the page");
+        }
+      },
+    
+      randomId: function(){
+  	    return (((Math.random())*0x1000000)|0).toString(16);
+  	  },
+	  
+  	  log: function(str){
+  	    $("div#status").replaceWith('<div id="status">'+str+'</div>'); // TODO implement a delay on messages to print, to prevent to display/remove messages very fast
+  	  },
+    
+      newRequestId: function(){
+        this.lastRid++;
+        return this.lastRid;
+      },
+    };
+    
+    $(document).ready(function () {
+      window.app.initialize();
+      //window.app = App;
+      //if (app.project !== undefined) {
+        //$('app').append(app.project.view.render().el);
+      //}
+    });
+		
+	</script>
+	
+	
+	
+	
+	
+	
+	
+	<script>
+  	$(function() {
+  		//$( "#pile1, #pile2" ).sortable({
+  		$( ".pileBox").sortable({
+  			connectWith: ".connectedSortable",
+  			
+  			change: function(event, ui) {
+  			  var tasks = $(".taskBox");
+  			  var taskNb = tasks.length;
+  			  var i = taskNb;
+  			  var gradientStep = gradientLen/taskNb;
+  			  if (taskNb < gradientLen) {
+  			    while (i--) {
+  			      tasks[i].style.backgroundColor = colorGradient[Math.floor(gradientStep*i)];
+			      }
+		      } else {
+		        while (gradientLen--) {
+		          i--;
+  			      tasks[i].style.backgroundColor = colorGradient[gradientLen];
+			      }
+			      while (i--) {
+  			      tasks[i].style.backgroundColor = "0xffffff";
+			      }
+		      }
+  			},
+  		}).disableSelection();
+  	});
+    
+    $(function() {
+      $('.taskInsertBox').hover(
+        function() {
+          $(this).find(".taskInsert").show();
+        }, 
+        function() {
+          $(this).find(".taskInsert").hide();
+        }
+      );
+      
+      $('.taskInsertLastBox').hover(
+        function() {
+          $(this).find(".taskInsert").show();
+        }, 
+        function() {
+          $(this).find(".taskInsert").hide();
+        }
+      );
+      
+      $('.taskBox').hover(
+        function() {
+          $(this).find(".taskArchiver").show();
+        }, 
+        function() {
+          $(this).find(".taskArchiver").hide();
+        }
+      );
+      
+      $('.pileHeader').hover(
+        function() {
+          $(this).find(".pileButton1").show();
+          $(this).find(".pileButton2").show();
+          $(this).find(".pileButton3").show();
+        }, 
+        function() {
+          $(this).find(".pileButton1").hide();
+          $(this).find(".pileButton2").hide();
+          $(this).find(".pileButton3").hide();
+        }
+      );
+    });
+    
+    function rz(t) {
+      t.style.height = 0;
+      t.style.height = (t.scrollHeight+4) + "px";
+    }
+  </script>
+	
+</head>
+
+<body>
+  <div id="container">
+  	<div id="status"></div>
+  	
+  	<div id="background-logo">
+  	  <div class="mega-title">AgileTasker</div>
+  	  <div class="mega-subtitle">Real-time shared todo lists for team workers</div>
+  	</div>
+  
+  	<div id="app">
+  	  
+  	</div>
+  	
+  </div>
+</body> 
+</html>

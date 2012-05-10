@@ -1,0 +1,78 @@
+<div id="pileContainer">
+  
+  <div class="pileBox">
+    <img class="taskInsertGhost" src="images/insert_task_ghost.jpeg" alt="Insert" />
+    <div class="pileHeader">
+      <input type="text" value="Pile name..." class="pileInput" />
+      <a class="pileButton1" href="#"><img src="images/goto_left.jpeg" alt="Move left" /></a>
+      <a class="pileButton2" href="#"><img src="images/goto_right.jpeg" alt="Move right" /></a>
+      <a class="pileButton3" href="#"><img src="images/done.jpeg" alt="Archive" /></a>
+    </div>
+  	<ul id="pile1" class="connectedSortable">
+    	<li>
+    	  <div class="taskBox">
+    	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+    	    <div style="display: inline;">
+    	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">Item 1</textarea>
+    	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+    	    </div>
+    	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="smalldate">Sept 18, 2011</div>
+    	  </div>
+    	</li>
+    	<li>
+    	  <div class="taskBox" >
+    	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+    	    <div style="display: inline;">
+    	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">Item 2</textarea>
+    	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+    	    </div>
+    	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="smalldate">Sept 18, 2011</div>
+    	  </div>
+    	</li>
+    	<li>
+    	  <div class="taskBox" >
+    	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+    	    <div style="display: inline;">
+    	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">Item 3</textarea>
+    	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+    	    </div>
+    	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="smalldate">Sept 18, 2011</div>
+    	  </div>
+    	</li>
+    	<li>
+    	  <div class="taskBox" >
+    	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+    	    <div style="display: inline;">
+    	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">Item 4</textarea>
+    	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+    	    </div>
+    	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="smalldate">Sept 18, 2011</div>
+    	  </div>
+    	</li>
+    	<li>
+    	  <div class="taskBox" >
+    	    <img class="taskGripper" src="images/gripper.png" alt="Drag" />
+    	    <div style="display: inline;">
+    	      <textarea class="taskInput" onkeyup="rz(this);" onkeydown="rz(this);">Item 5</textarea>
+    	      <a href="#"><img class="taskArchiver" src="images/done.jpeg" alt="Archive" /></a>
+    	    </div>
+    	    <div class="taskInsertBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="taskInsertLastBox"><a href="#"><img class="taskInsert" src="images/insert_task.jpeg" alt="Insert" /></a></div>
+    	    <div class="smalldate">Sept 18, 2011</div>
+    	  </div>
+    	</li>
+    </ul>
+  </div>
+
+  <ul id="pile2" class="connectedSortable">
+  	<li class="ui-state-highlight">Item 1</li>
+  	<li class="ui-state-highlight">Item 2</li>
+  	<li class="ui-state-highlight">Item 3</li>
+  	<li class="ui-state-highlight">Item 4</li>
+  	<li class="ui-state-highlight">Item 5</li>
+  </ul>
+</div>

@@ -1,0 +1,158 @@
+.help {font-size: medium; color: lightgrey;}
+#pile1, #pile2 { list-style-type: none; margin: 0; padding: 0; float: left; margin-right: 50px; }
+#pile1 li, #pile2 li { 
+  margin: 0px 0px 5px 0px; 
+  padding: 0px;
+  width: 220px;
+}
+.taskGripper {
+  padding: 1px; 
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  cursor: move;
+}
+.taskArchiver { 
+  display: none;
+  padding: 0px;
+  position: absolute; 
+  top: 0px;
+  right: 0px;
+}
+.taskInsertBox {
+  position: absolute;
+  left: -30px;
+  top: -12px;
+  height: 20px;
+  width: 26px;
+}
+.taskInsertLastBox {
+  position: absolute;
+  left: -30px;
+  bottom: -15px;
+  height: 20px;
+  width: 26px;
+}
+.taskInsert {
+  display: none;
+}
+.taskInsertGhost {
+  position: absolute;
+  left: -30px;
+  top: 26px;
+}
+.pileButton1 {
+  display: none;
+  padding: 0px;
+  position: absolute; 
+  top: -2px;
+  right: 24px;
+}
+.pileButton2 {
+  display: none;
+  padding: 0px;
+  position: absolute; 
+  top: -2px;
+  right: 12px;
+}
+.pileButton3 {
+  display: none;
+  padding: 0px;
+  position: absolute; 
+  top: -2px;
+  right: 0px;
+}
+.smalldate {
+  position: absolute;
+  font-family: Helvetica, Arial;
+  font-size: 9px;
+  color: black;
+  background-color: white;
+  width: 58px;
+  bottom: 0;
+}
+.taskBox {
+  position: relative;
+  white-space: nowrap;
+  margin-top: 5px; 
+  border: 0px; 
+  border-style: solid;
+  width: 256px;
+}
+.taskInput {
+  font-family: Helvetica, Arial;
+  font-size: 11px;
+  border: 0px;
+  white-space: pre-wrap;
+  display: inline;
+  background-color: transparent;
+  padding-left: 14px;
+  padding-bottom: 0px;
+  width: 240px; /* needs to be set manually unfortunatly */
+  outline: none;
+  overflow: hidden;
+  resize: none;
+}
+.pileHeader {
+  position: relative;
+  padding: 0px; 
+  border: 0px; 
+  border-style: solid;
+  width: 256px;
+}
+.pileInput { 
+  font-family: Helvetica, Arial;
+  font-size: 18px;
+  border: 0px;
+  white-space: pre-wrap;
+  display: inline;
+  background-color: grey;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  width: 255px; /* needs to be set manually unfortunatly */
+  height: 32px;
+  outline: none;
+  overflow: hidden;
+  resize: none;
+}
+.pileBox {
+  position: relative;
+  padding: 0px;
+  border: 0px; 
+  border-style: solid;
+  border-color: black;
+  width: 256px;
+  overflow: visible;
+}
+
+.project-title {font: 4em Helvetica, Arial;}
+.project-title:hover { color: grey; }
+.project-title-input {font: 4em Helvetica, Arial; }
+
+#status {
+  position: fixed;
+  left: 50%;
+  background-color: lightyellow; 
+}
+#pileContainer {
+  position: absolute;
+  top: 128px;
+  left: 64px;
+}
+#container {
+   position: relative;
+   min-width: 2048px;
+   top: 20px;
+}
+#background-logo {
+   position: absolute;
+   top: 128px;
+   left: 128px;
+   bottom: 0;
+   right: 0;
+   z-index: -1;
+   text-overflow: clip; 
+   white-space:nowrap;
+}
+.mega-title {font: bold 20em Helvetica, Arial; }
+.mega-subtitle {font: bold 3em Helvetica, Arial; position: absolute; left: 512px;}
